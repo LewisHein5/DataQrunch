@@ -1,9 +1,9 @@
-use std::fmt::{Display, Formatter};
 use rand::Rng;
+use std::fmt::{Display, Formatter};
 
 #[derive(Hash, PartialEq, Clone)]
 pub(crate) struct SessionKey {
-    key:Vec<bool>
+    key: Vec<bool>,
 }
 
 impl TryFrom<&String> for SessionKey {
@@ -16,7 +16,7 @@ impl TryFrom<&String> for SessionKey {
                 key.push(match c {
                     '0' => false,
                     '1' => true,
-                    _ => break
+                    _ => break,
                 })
             }
             return Ok(SessionKey { key });
@@ -35,8 +35,9 @@ impl Display for SessionKey {
 impl SessionKey {
     pub(crate) fn new() -> SessionKey {
         let mut rng = rand::thread_rng();
-        let mut key:Vec<bool> = Vec::new();
-        for _i in 0..4 { //TODO: Use a variable for key length
+        let mut key: Vec<bool> = Vec::new();
+        for _i in 0..4 {
+            //TODO: Use a variable for key length
             key.push(rng.gen::<bool>());
         }
 
@@ -48,13 +49,13 @@ impl SessionKey {
         for digit in &self.key {
             str.push(match digit {
                 true => '1',
-                false => '0'
+                false => '0',
             });
         }
 
         return str;
     }
- }
+}
 
 impl Into<String> for SessionKey {
     fn into(self) -> String {

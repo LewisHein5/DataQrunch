@@ -1,8 +1,8 @@
-use serde::{Serialize, Deserialize};
-use actix_web::{web, Responder, Result};
 use crate::session_key::SessionKey;
 use crate::user_session_data::UserSessionData;
 use crate::user_session_data_cache::UserSessionDataCache;
+use actix_web::{web, Responder};
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize)]
 pub(crate) struct LoginDto {
@@ -12,10 +12,13 @@ pub(crate) struct LoginDto {
 #[derive(Serialize)]
 struct LoginResponse {
     status: String,
-    session_key: String
+    session_key: String,
 }
 
-pub(crate) async fn login(login_data: web::Json<LoginDto>, user_hash: web::Data<UserSessionDataCache>) -> actix_web::Result<impl Responder> {
+pub(crate) async fn login(
+    login_data: web::Json<LoginDto>,
+    user_hash: web::Data<UserSessionDataCache>,
+) -> actix_web::Result<impl Responder> {
     //TODO: Check that user exists
     //Todo: Validate password
     //Todo: Get user ID
@@ -28,7 +31,7 @@ pub(crate) async fn login(login_data: web::Json<LoginDto>, user_hash: web::Data<
 
     let response = LoginResponse {
         status: String::from("OK"),
-        session_key: key.into()
+        session_key: key.into(),
     };
 
     return Ok(web::Json(response));

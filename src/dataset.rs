@@ -1,7 +1,7 @@
 use rmp_serde;
 use std::fs::File;
-use std::{fmt, io};
 use std::path::Path;
+use std::{fmt, io};
 
 use crate::dataset_dto::DatasetDto;
 use actix_web::web;
@@ -40,7 +40,10 @@ impl TryFrom<web::Json<DatasetDto>> for Dataset {
         let header_len = dataset_dto.header.len();
         let data_types_len = dataset_dto.data_types.len();
         if header_len != data_types_len {
-            return Err(DatasetFormatError::DataTypesWrongLength(header_len, data_types_len));
+            return Err(DatasetFormatError::DataTypesWrongLength(
+                header_len,
+                data_types_len,
+            ));
         }
 
         let n_cols = dataset_dto.columns.len();

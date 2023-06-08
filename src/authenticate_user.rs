@@ -9,7 +9,7 @@ pub(crate) fn get_user_session_data(
     session_key: &String,
     user_data_cache: web::Data<UserSessionDataCache>,
 ) -> Result<UserSessionData, HttpResponse> {
-    let access_denied_response = HttpResponse::Forbidden().body("Access denied");
+    let access_denied_response = HttpResponse::Unauthorized().body("");
     let session_key = match SessionKey::try_from(session_key) {
         Ok(val) => val,
         Err(_) => return Err(access_denied_response),

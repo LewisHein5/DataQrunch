@@ -136,15 +136,31 @@ impl RedisManager {
         };
     }
 
-    pub (crate) fn set_dataset_size(&self, user_name: &String, dataset_id: Uuid, size: u64) -> Result<(), RedisError> {
+    pub(crate) fn set_dataset_size(
+        &self,
+        user_name: &String,
+        dataset_id: Uuid,
+        size: u64,
+    ) -> Result<(), RedisError> {
         let mut conn = self.get_connection()?;
 
-        conn.hset(make_dataset_hashset_key(user_name, &dataset_id.to_string()), "size", size)?;
+        conn.hset(
+            make_dataset_hashset_key(user_name, &dataset_id.to_string()),
+            "size",
+            size,
+        )?;
 
         return Ok(());
     }
 
-    pub(crate) fn get_dataset_size(&self, user_name: &String, dataset_id: Uuid) -> Result<u64, RedisError> {
-        return Ok(self.get_connection()?.hget(make_dataset_hashset_key(user_name, &dataset_id.to_string()), "size")?);
+    pub(crate) fn get_dataset_size(
+        &self,
+        user_name: &String,
+        dataset_id: Uuid,
+    ) -> Result<u64, RedisError> {
+        return Ok(self.get_connection()?.hget(
+            make_dataset_hashset_key(user_name, &dataset_id.to_string()),
+            "size",
+        )?);
     }
 }

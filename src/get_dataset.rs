@@ -3,22 +3,24 @@ use crate::dataset::Dataset;
 use crate::log_error;
 use crate::redis_manager::RedisManager;
 use crate::user_session_data_cache::UserSessionDataCache;
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{web, HttpResponse, Responder, HttpRequest};
 use serde::Deserialize;
 use uuid::Uuid;
 
-#[derive(Deserialize)]
-pub(crate) struct DatasetRequest {
-    session_key: String,
-}
-
 pub(crate) async fn get_dataset(
-    req: web::Json<DatasetRequest>,
+    req: HttpRequest,
     path: web::Path<String>,
     user_data_cache: web::Data<UserSessionDataCache>,
     redis_manager: web::Data<RedisManager>,
 ) -> impl Responder {
-    let user_data = match get_user_session_data(&req.session_key, user_data_cache) {
+    let session_key = req
+        .headers()
+        .get("session_key")
+        .expect("Grr") // Todo: Return bad request
+        .to_str()
+        .expect("Grrr"); //Todo: Use real authentication
+
+    let user_data = match get_user_session_data(&String::from(session_key), user_data_cache) {
         Ok(val) => val,
         Err(e) => return e,
     };

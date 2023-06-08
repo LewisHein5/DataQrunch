@@ -35,7 +35,9 @@ pub(crate) async fn new_dataset(
 
     let dataset = match Dataset::try_from(data) {
         Ok(val) => val,
-        Err(e) => {return HttpResponse::BadRequest().body(e.to_string());}
+        Err(e) => {
+            return HttpResponse::BadRequest().body(e.to_string());
+        }
     };
 
     let dataset_size = match dataset.try_save_to(&out_path) {
@@ -55,7 +57,11 @@ pub(crate) async fn new_dataset(
     match redis_manager.set_dataset_size(&user_data.user_name, dataset_uuid, dataset_size) {
         Ok(_) => (),
         Err(e) => {
-            let error_json = log_error!("Could not set dataset size for user {}, dataset {}", user_data.user_name, dataset_uuid);
+            let error_json = log_error!(
+                "Could not set dataset size for user {}, dataset {}",
+                user_data.user_name,
+                dataset_uuid
+            );
             return HttpResponse::InternalServerError().body(error_json);
         }
     }

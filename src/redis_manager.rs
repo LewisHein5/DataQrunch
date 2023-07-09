@@ -13,7 +13,7 @@ fn make_dataset_hashset_key(user_name: &String, dataset_name: &String) -> String
 }
 
 #[derive(Clone)]
-pub(crate) struct RedisManager {
+pub struct RedisManager {
     redis_client: redis::Client,
 }
 

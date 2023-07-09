@@ -1,13 +1,13 @@
+use actix_web::{HttpRequest, HttpResponse, Responder, web};
+use uuid::Uuid;
 
-use super::models::dataset::Dataset;
 use crate::log_error;
 use crate::redis_manager::RedisManager;
-use actix_web::{web, HttpResponse, Responder, HttpRequest};
 
-use uuid::Uuid;
-use crate::api::get_authenticated_user_id::get_authenticated_user_id;
+use super::super::models::Dataset;
+use super::super::super::get_authenticated_user_id::get_authenticated_user_id;
 
-pub(crate) async fn get_dataset(
+pub async fn get_dataset(
     req: HttpRequest,
     path: web::Path<String>,
     redis_manager: web::Data<RedisManager>,

@@ -8,7 +8,7 @@ use flate2::{Compression, GzBuilder};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
-pub(crate) struct Dataset {
+pub struct Dataset {
     pub(crate) header: Vec<String>,
     pub(crate) data_types: Vec<String>,
     pub(crate) columns: Vec<Vec<String>>,

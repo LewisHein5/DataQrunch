@@ -1,11 +1,12 @@
 use actix_web::{HttpRequest, HttpResponse, Responder, web};
 
-use crate::api::get_authenticated_user_id::get_authenticated_user_id;
 use crate::log_error;
 use crate::redis_manager::RedisManager;
-use super::models::dataset_info::DatasetInfo;
 
-pub(crate) async fn get_datasets_list(
+use super::super::models::DatasetInfo;
+use super::super::super::get_authenticated_user_id::get_authenticated_user_id;
+
+pub async fn list_datasets(
     req: HttpRequest,
     redis_manager: web::Data<RedisManager>,
 ) -> impl Responder {

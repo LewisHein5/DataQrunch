@@ -1,14 +1,15 @@
-use super::models::dataset::Dataset;
+use std::path::Path;
 
+use actix_web::{HttpRequest, HttpResponse, Responder, web};
+use uuid::Uuid;
 
 use crate::log_error;
 use crate::redis_manager::RedisManager;
-use actix_web::{web, HttpResponse, Responder, HttpRequest};
-use std::path::Path;
-use uuid::Uuid;
-use crate::api::get_authenticated_user_id::get_authenticated_user_id;
 
-pub(crate) async fn new_dataset(
+use super::super::models::Dataset;
+use super::super::super::get_authenticated_user_id::get_authenticated_user_id;
+
+pub async fn new_dataset(
     req: HttpRequest,
     dataset: web::Json<Dataset>,
     redis_manager: web::Data<RedisManager>,

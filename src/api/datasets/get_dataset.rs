@@ -1,41 +1,30 @@
-use crate::get_user_session_data::get_user_session_data;
-use crate::api::datasets::dataset::Dataset;
+
+use super::models::dataset::Dataset;
 use crate::log_error;
 use crate::redis_manager::RedisManager;
-use crate::user_session_data_cache::UserSessionDataCache;
 use actix_web::{web, HttpResponse, Responder, HttpRequest};
 
 use uuid::Uuid;
-use super::super::get_user_bearer_token::get_user_bearer_token;
+use crate::api::get_authenticated_user_id::get_authenticated_user_id;
 
 pub(crate) async fn get_dataset(
     req: HttpRequest,
     path: web::Path<String>,
-    user_data_cache: web::Data<UserSessionDataCache>,
     redis_manager: web::Data<RedisManager>,
 ) -> impl Responder {
-    let session_key = match get_user_bearer_token(req) {
-        Ok(value) => value,
-        Err(value) => return value,
-    };
-
-    let user_data = match get_user_session_data(&String::from(session_key), user_data_cache) {
-        Ok(val) => val,
-        Err(e) => return e,
-    };
-
+    let user_id = get_authenticated_user_id(req);
     let dataset_uuid = match Uuid::parse_str(path.as_str()) {
         Ok(val) => val,
         Err(_) => return HttpResponse::BadRequest().body("Invalid dataset name (Must be a UUID)"),
     };
 
-    let dataset_path = match redis_manager.get_dataset_path(&user_data.user_name, &dataset_uuid) {
+    let dataset_path = match redis_manager.get_dataset_path(&user_id, &dataset_uuid) {
         Some(val) => match val {
             Ok(val) => val,
             Err(e) => {
                 let error_json = log_error!(
                     "Could not get path for user {}, dataset id {}. Error condition: {}",
-                    user_data.user_name,
+                    user_id,
                     dataset_uuid,
                     e.to_string()
                 );
@@ -57,7 +46,7 @@ pub(crate) async fn get_dataset(
             let error_json = log_error!(
                 "Could not load dataset {} for user {}. Error condition: {}",
                 dataset_uuid,
-                user_data.user_name,
+                user_id,
                 e.to_string()
             );
             return HttpResponse::InternalServerError().body(error_json);
@@ -70,7 +59,7 @@ pub(crate) async fn get_dataset(
             let error_json = log_error!(
                 "Error converting dataset {} for user {} to JSON. Error condition: {}",
                 dataset_uuid,
-                user_data.user_name,
+                user_id,
                 e.to_string()
             );
             HttpResponse::InternalServerError().body(error_json)

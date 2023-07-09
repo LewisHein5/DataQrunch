@@ -1,7 +1,7 @@
 use alcoholic_jwt::{token_kid, validate, Validation};
 use crate::authentication::contract::claims::Claims;
 use crate::authentication::contract::errors::JwtAuthenticationError;
-use crate::authentication::contract::errors::JwtAuthenticationError::{MalformedJwtError, JWKSFetchError, KidDecodeError, KidNotFoundInSetError, UnauthorizedJwtError};
+use crate::authentication::contract::errors::JwtAuthenticationError::{JWKSFetchError, KidDecodeError, KidNotFoundInSetError, UnauthorizedJwtError};
 use crate::authentication::get_authority::get_authority;
 use crate::authentication::handlers::fetch_jkws::fetch_jwks;
 
@@ -13,7 +13,7 @@ pub (crate) async fn get_claims(token: &str) -> Result<Claims, JwtAuthentication
 
     let jwks = match fetch_jwks().await {
         Ok(val) => val,
-        Err(E) => return Err(JWKSFetchError)
+        Err(_) => return Err(JWKSFetchError)
     };
 
     let validations = vec![Validation::Issuer(get_authority()), Validation::SubjectPresent];

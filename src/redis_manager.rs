@@ -1,5 +1,5 @@
 use redis;
-use redis::{Commands, Connection, ConnectionLike, RedisError, RedisResult};
+use redis::{Commands, Connection, ConnectionLike, RedisError};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use uuid::Uuid;

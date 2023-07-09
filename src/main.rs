@@ -1,9 +1,5 @@
-mod get_user_session_data;
 mod log_error;
 mod redis_manager;
-mod session_key;
-mod user_session_data;
-mod user_session_data_cache;
 mod authentication;
 mod api;
 mod authorization;
@@ -12,8 +8,7 @@ use actix_cors::Cors;
 use actix_session::{SessionMiddleware, storage::RedisActorSessionStore};
 use actix_web_httpauth::middleware::HttpAuthentication;
 use actix_web::cookie::Key;
-use crate::api::datasets::{list_datasets, new_dataset};
-use user_session_data_cache::UserSessionDataCache;
+use crate::api::datasets::{list_datasets};
 
 use crate::redis_manager::RedisManager;
 use actix_web::{App, HttpServer, web};
@@ -32,7 +27,6 @@ async fn main() -> std::io::Result<()> {
     let host = String::from("127.0.0.1");
     let port = 6379;
     let redis_connection_string = format!("{}:{}", host, port);
-    let user_session_key_store = web::Data::new(UserSessionDataCache::new());
     let redis_manager =
         web::Data::new(RedisManager::new(host, port).expect("Could not connect to redis"));
 
@@ -47,7 +41,6 @@ async fn main() -> std::io::Result<()> {
                 RedisActorSessionStore::new(&redis_connection_string),
                 secret_key.clone(),
             ))
-            .app_data(user_session_key_store.clone())
             .app_data(redis_manager.clone())
             .route("/datasets/new", web::post().to(new_dataset))
             .route("/datasets/{id}", web::get().to(get_dataset))

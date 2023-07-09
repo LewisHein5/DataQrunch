@@ -2,8 +2,7 @@ use rmp_serde;
 use std::fs::File;
 use std::path::Path;
 use std::{fmt, io};
-use crate::api::datasets::dataset_dto::DatasetDto;
-use actix_web::web;
+
 use flate2::read::GzDecoder;
 use flate2::{Compression, GzBuilder};
 use serde::{Deserialize, Serialize};
@@ -29,41 +28,6 @@ impl fmt::Display for DatasetFormatError {
             DatasetFormatError::WrongNumberOfColumns(h, n_col) => write!(f, "Header has {} columns but data contains {} columns", h, n_col),
             DatasetFormatError::ColumnLengthsDiffer => write!(f, "Not all columns contain the same number of rows")
         }
-    }
-}
-
-impl TryFrom<web::Json<DatasetDto>> for Dataset {
-    type Error = DatasetFormatError;
-    fn try_from(dataset_dto: web::Json<DatasetDto>) -> Result<Dataset, Self::Error> {
-
-        let header_len = dataset_dto.header.len();
-        let data_types_len = dataset_dto.data_types.len();
-        if header_len != data_types_len {
-            return Err(DatasetFormatError::DataTypesWrongLength(
-                header_len,
-                data_types_len,
-            ));
-        }
-
-        let n_cols = dataset_dto.columns.len();
-        if header_len != n_cols {
-            return Err(DatasetFormatError::WrongNumberOfColumns(header_len, n_cols));
-        }
-
-        if n_cols > 0 {
-            let n_rows = dataset_dto.columns[0].len();
-            for i in 2..n_cols {
-                if dataset_dto.columns[i].len() != n_rows {
-                    return Err(DatasetFormatError::ColumnLengthsDiffer);
-                }
-            }
-        }
-
-        return Ok(Dataset {
-            header: dataset_dto.header.clone(),
-            data_types: dataset_dto.data_types.clone(),
-            columns: dataset_dto.columns.clone(),
-        });
     }
 }
 

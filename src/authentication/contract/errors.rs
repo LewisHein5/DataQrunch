@@ -1,6 +1,6 @@
 use actix_web::{error::ResponseError, HttpResponse};
 use derive_more::Display;
-//todo: Refactor this, putting it in the authentication module violates seperation of concerns
+//todo: Refactor this, putting it in the authentication module violates separation of concerns
 
 
 #[derive(Debug, Display)]

@@ -1,9 +1,10 @@
-use crate::authenticate_user::get_user_session_data;
+use crate::get_user_session_data::get_user_session_data;
 use crate::log_error;
 use crate::redis_manager::RedisManager;
 use crate::user_session_data_cache::UserSessionDataCache;
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
-use serde::{Deserialize, Serialize};
+use actix_web_httpauth::extractors::bearer::BearerAuth;
+use serde::{Serialize};
 use uuid::Uuid;
 
 pub(crate) struct DatasetsListRequest {
@@ -17,9 +18,10 @@ pub(crate) struct DatasetInfo {
 }
 pub(crate) async fn get_datasets_list(
     req: HttpRequest,
-    user_data_cache: web::Data<UserSessionDataCache>,
+    credentials: BearerAuth,
     redis_manager: web::Data<RedisManager>,
 ) -> impl Responder {
+
     let session_key = req
         .headers()
         .get("session_key")

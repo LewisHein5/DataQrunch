@@ -1,7 +1,7 @@
 use crate::session_key::SessionKey;
 use crate::user_session_data::UserSessionData;
 use crate::user_session_data_cache::UserSessionDataCache;
-use actix_web::error::ErrorForbidden;
+
 use actix_web::{web, HttpResponse};
 use std::ops::Deref;
 

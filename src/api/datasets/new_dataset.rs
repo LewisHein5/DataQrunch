@@ -1,15 +1,16 @@
 use super::dataset::Dataset;
 use super::dataset_dto::DatasetDto;
-use super::user_session_data_cache::UserSessionDataCache;
-use crate::authenticate_user::get_user_session_data;
+use crate::user_session_data_cache::UserSessionDataCache;
+use crate::get_user_session_data::get_user_session_data;
 use crate::log_error;
 use crate::redis_manager::RedisManager;
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{web, HttpResponse, Responder, HttpRequest};
 use std::path::Path;
 use uuid::Uuid;
 
 pub(crate) async fn new_dataset(
-    data: web::Json<DatasetDto>,
+    req: HttpRequest,
+    data: web::Json<Dataset>,
     user_data_cache: web::Data<UserSessionDataCache>,
     redis_manager: web::Data<RedisManager>,
 ) -> impl Responder {

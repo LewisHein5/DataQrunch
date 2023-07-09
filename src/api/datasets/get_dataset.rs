@@ -1,11 +1,12 @@
-use crate::authenticate_user::get_user_session_data;
-use crate::dataset::Dataset;
+use crate::get_user_session_data::get_user_session_data;
+use crate::api::datasets::dataset::Dataset;
 use crate::log_error;
 use crate::redis_manager::RedisManager;
 use crate::user_session_data_cache::UserSessionDataCache;
 use actix_web::{web, HttpResponse, Responder, HttpRequest};
-use serde::Deserialize;
+
 use uuid::Uuid;
+use super::super::get_user_bearer_token::get_user_bearer_token;
 
 pub(crate) async fn get_dataset(
     req: HttpRequest,
@@ -13,12 +14,10 @@ pub(crate) async fn get_dataset(
     user_data_cache: web::Data<UserSessionDataCache>,
     redis_manager: web::Data<RedisManager>,
 ) -> impl Responder {
-    let session_key = req
-        .headers()
-        .get("session_key")
-        .expect("Grr") // Todo: Return bad request
-        .to_str()
-        .expect("Grrr"); //Todo: Use real authentication
+    let session_key = match get_user_bearer_token(req) {
+        Ok(value) => value,
+        Err(value) => return value,
+    };
 
     let user_data = match get_user_session_data(&String::from(session_key), user_data_cache) {
         Ok(val) => val,

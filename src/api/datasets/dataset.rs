@@ -2,8 +2,7 @@ use rmp_serde;
 use std::fs::File;
 use std::path::Path;
 use std::{fmt, io};
-
-use crate::dataset_dto::DatasetDto;
+use crate::api::datasets::dataset_dto::DatasetDto;
 use actix_web::web;
 use flate2::read::GzDecoder;
 use flate2::{Compression, GzBuilder};

@@ -1,4 +1,4 @@
-use uuid;
+use uuid::Uuid;
 
 #[macro_export]
 macro_rules! log_error {

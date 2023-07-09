@@ -5,7 +5,7 @@ use crate::authentication::contract::errors::JwtAuthenticationError::{MalformedJ
 use crate::authentication::get_authority::get_authority;
 use crate::authentication::handlers::fetch_jkws::fetch_jwks;
 
-pub async fn get_claims(token: &str) -> Result<Claims, JwtAuthenticationError>{
+pub (crate) async fn get_claims(token: &str) -> Result<Claims, JwtAuthenticationError>{
     let kid = match token_kid(&token) {
         Ok(val) => val.ok_or(KidDecodeError)?,
         Err(_) => return Err(JWKSFetchError)

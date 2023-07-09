@@ -3,7 +3,7 @@ use crate::authentication::contract::errors::JwtAuthenticationError;
 use crate::authentication::contract::errors::JwtAuthenticationError::MalformedJwtError;
 
 pub(crate) struct Claims {
-    sub: String,
+    pub(crate) sub: String,
     exp: u64
 }
 

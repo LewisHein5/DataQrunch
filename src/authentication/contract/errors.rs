@@ -4,7 +4,7 @@ use derive_more::Display;
 
 
 #[derive(Debug, Display)]
-pub enum JwtAuthenticationError {
+pub(crate) enum JwtAuthenticationError {
     #[display(fmt = "Internal Server Error")]
     MalformedJwtError,
 
@@ -13,13 +13,13 @@ pub enum JwtAuthenticationError {
 
     #[display(fmt = "JWKSFetchError")]
     JWKSFetchError,
-    
+
     #[display(fmt = "KidDecodeError")]
     KidDecodeError,
-    
+
     #[display(fmt = "KidNotFoundInSetError")]
     KidNotFoundInSetError,
-    
+
     #[display(fmt = "UnauthorizedJwtError")]
     UnauthorizedJwtError
 }

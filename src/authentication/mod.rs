@@ -1,3 +1,3 @@
 pub mod handlers;
-mod contract;
+pub mod contract;
 mod get_authority;

@@ -17,6 +17,7 @@ pub struct RedisManager {
     redis_client: redis::Client,
 }
 
+//TODO: Make functions async
 impl RedisManager {
     pub(crate) fn new(host: String, port: u32) -> Result<RedisManager, RedisError> {
         let conn_string = format!("redis://{}/", host);

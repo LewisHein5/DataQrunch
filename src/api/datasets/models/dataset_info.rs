@@ -1,4 +1,6 @@
+use actix_web::error;
 use serde::Serialize;
+use uuid::Uuid;
 
 #[derive(Serialize)]
 pub struct DatasetInfo {

@@ -8,6 +8,7 @@ use env_logger;
 use api::datasets::handlers::{getDataset, listDatasets, createDataset};
 use authentication::handlers::validate_request;
 use redis_manager::RedisManager;
+use crate::api::datasets::handlers::put_dataset::updateDataset;
 
 mod redis_manager;
 mod authentication;
@@ -41,6 +42,7 @@ async fn main() -> std::io::Result<()> {
             .service(getDataset)
             .service(createDataset)
             .service(listDatasets)
+            .service(updateDataset)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

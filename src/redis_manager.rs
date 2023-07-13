@@ -1,7 +1,8 @@
 use redis;
 use redis::{Commands, Connection, ConnectionLike, RedisError};
 use std::path::{Path, PathBuf};
-use std::time::Duration;
+use std::time::{Duration};
+use chrono::prelude::*;
 use uuid::Uuid;
 
 fn make_datasets_set_key(user_name: &String) -> String {
@@ -78,7 +79,34 @@ impl RedisManager {
             dataset_path.to_string_lossy().to_string(),
         )?;
 
+        self.update_dataset_modify_time(user_name, dataset_uuid)?;
+
         return Ok(());
+    }
+
+    pub(crate) fn update_dataset_modify_time(
+        &self,
+        user_name: &String,
+        dataset_uuid: &Uuid
+    ) -> Result<(), RedisError> {
+        let mut conn = self.get_connection()?;
+        conn.hset::<String, &str, String, ()>(
+            make_dataset_hashset_key(&user_name, &dataset_uuid.to_string()),
+            "timestamp",
+            Utc::now().to_string()
+        )?;
+
+        return Ok(());
+    }
+
+    pub(crate) fn get_dataset_timestamp(&self,user_name: &String, dataset_uuid: &Uuid) -> Result<String, RedisError> {
+        let mut conn = self.get_connection()?;
+        let time: String = match conn.hget(make_dataset_hashset_key(&user_name, &dataset_uuid.to_string()), "timestamp") {
+            Ok(val) => val,
+            Err(e) => {return Err(e);}
+        };
+
+        return Ok(time);
     }
 
     //NOTE: It is the caller's responsibility to authenticate the user

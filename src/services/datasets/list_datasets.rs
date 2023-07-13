@@ -1,5 +1,6 @@
 use actix_web::error;
 use actix_web::web::Data;
+use chrono::DateTime;
 use crate::redis_manager::RedisManager;
 use crate::api::datasets::models::dataset_info::DatasetInfo;
 
@@ -12,10 +13,11 @@ pub(crate) fn listDatasets(redis_manager: Data<RedisManager>, user_id: &String) 
         let dataset_size = redis_manager.get_dataset_size(
             &user_id, dataset_id
         ).map_err(|e| error::ErrorInternalServerError(e))?;
-
+        let dataset_time = redis_manager.get_dataset_timestamp(user_id, &dataset_id).map_err(|e| error::ErrorInternalServerError(e))?;
         datasets_info_list.push(DatasetInfo {
             id: dataset_id.to_string(),
             size: dataset_size,
+            timestamp: dataset_time
         })
     }
     Ok(datasets_info_list)

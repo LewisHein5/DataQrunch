@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 pub struct Dataset {
     pub(crate) header: Vec<String>,
     pub(crate) data_types: Vec<String>,
-    pub(crate) columns: Vec<Vec<String>>,
+    pub(crate) rows: Vec<Vec<String>>,
 }
 
 impl Dataset {

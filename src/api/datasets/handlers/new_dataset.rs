@@ -7,14 +7,13 @@ use crate::services::datasets::get_dataset::getDataset;
 use super::super::models::Dataset;
 use super::super::super::get_authenticated_user_id::get_authenticated_user_id;
 
-#[post("/datasets/new")]
+#[post("/datasets")]
 pub async fn createDataset(
     req: HttpRequest,
     dataset: web::Json<Dataset>,
     redis_manager: web::Data<RedisManager>,
 ) -> actix_web::Result<HttpResponse, error::Error> {
     let user_id = get_authenticated_user_id(req);
-
 
     let dataset_uuid = create_dataset::createDataset(dataset, &redis_manager, &user_id)?;
 

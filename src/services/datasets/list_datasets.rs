@@ -17,7 +17,7 @@ pub(crate) fn listDatasets(redis_manager: Data<RedisManager>, user_id: &String) 
         datasets_info_list.push(DatasetInfo {
             id: dataset_id.to_string(),
             size: dataset_size,
-            timestamp: dataset_time
+            modified: dataset_time
         })
     }
     Ok(datasets_info_list)

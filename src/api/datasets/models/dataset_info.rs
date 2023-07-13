@@ -7,5 +7,5 @@ use uuid::Uuid;
 pub struct DatasetInfo {
     pub(crate) id: String,
     pub(crate) size: u64,
-    pub(crate) timestamp: String
+    pub(crate) modified: String
 }

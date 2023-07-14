@@ -14,7 +14,9 @@ pub(crate) fn listDatasets(redis_manager: Data<RedisManager>, user_id: &String) 
             &user_id, dataset_id
         ).map_err(|e| error::ErrorInternalServerError(e))?;
         let dataset_time = redis_manager.get_dataset_timestamp(user_id, &dataset_id).map_err(|e| error::ErrorInternalServerError(e))?;
+        let dataset_name = redis_manager.get_dataset_name(user_id, &dataset_id).map_err(|e| error::ErrorInternalServerError(e))?;
         datasets_info_list.push(DatasetInfo {
+            name: dataset_name,
             id: dataset_id.to_string(),
             size: dataset_size,
             modified: dataset_time

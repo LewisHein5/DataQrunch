@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct Dataset {
+    pub(crate) name: String,
     pub(crate) header: Vec<String>,
     pub(crate) data_types: Vec<String>,
     pub(crate) rows: Vec<Vec<String>>,
@@ -34,8 +35,6 @@ impl Dataset {
     pub(crate) async fn load_from(file_name: &String) -> Result<Dataset, error::Error> {
         let file = NamedFile::open_async(file_name).await?;
         let mut decoder_buf = io::BufReader::new(GzDecoder::new(file.file()));
-        //let mut binding = decoder_buf.buffer();
-
         let mut deserializer = rmp_serde::decode::Deserializer::new(&mut decoder_buf);
         return Dataset::deserialize(&mut deserializer)
             .map_err(

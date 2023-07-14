@@ -9,8 +9,8 @@ fn make_datasets_set_key(user_name: &String) -> String {
     return format!("users:{}:datasets", user_name);
 }
 
-fn make_dataset_hashset_key(user_name: &String, dataset_name: &String) -> String {
-    return format!("users:{}:datasets:{}", user_name, dataset_name);
+fn make_dataset_hashset_key(user_name: &String, dataset_uuid: &Uuid) -> String {
+    return format!("users:{}:datasets:{}", user_name, dataset_uuid.to_string());
 }
 
 #[derive(Clone)]
@@ -58,6 +58,7 @@ impl RedisManager {
         user_name: &String,
         dataset_uuid: &Uuid,
         dataset_path: &Path,
+        dataset_name: &String
     ) -> Result<(), RedisError> {
         let mut conn = self.get_connection()?;
 
@@ -65,18 +66,23 @@ impl RedisManager {
         let set_key = make_datasets_set_key(&user_name.clone());
         let uuid_string = dataset_uuid.to_string();
         conn.sadd::<String, String, ()>(set_key, uuid_string)?;
-
         conn.hset::<String, &str, &str, ()>(
-            make_dataset_hashset_key(&user_name, &dataset_uuid.to_string()),
+            make_dataset_hashset_key(&user_name, &dataset_uuid),
             "status",
             "active",
         )?;
 
         //TODO: Hot to make this cleaner without panicking?
         conn.hset::<String, &str, String, ()>(
-            make_dataset_hashset_key(&user_name, &dataset_uuid.to_string()),
+            make_dataset_hashset_key(&user_name, &dataset_uuid),
             "path",
             dataset_path.to_string_lossy().to_string(),
+        )?;
+
+        conn.hset::<String, &str, &String, ()>(
+            make_dataset_hashset_key(&user_name, &dataset_uuid),
+            "name",
+            dataset_name
         )?;
 
         self.update_dataset_modify_time(user_name, dataset_uuid)?;
@@ -91,7 +97,7 @@ impl RedisManager {
     ) -> Result<(), RedisError> {
         let mut conn = self.get_connection()?;
         conn.hset::<String, &str, String, ()>(
-            make_dataset_hashset_key(&user_name, &dataset_uuid.to_string()),
+            make_dataset_hashset_key(&user_name, &dataset_uuid),
             "timestamp",
             Utc::now().to_string()
         )?;
@@ -101,7 +107,7 @@ impl RedisManager {
 
     pub(crate) fn get_dataset_timestamp(&self,user_name: &String, dataset_uuid: &Uuid) -> Result<String, RedisError> {
         let mut conn = self.get_connection()?;
-        let time: String = match conn.hget(make_dataset_hashset_key(&user_name, &dataset_uuid.to_string()), "timestamp") {
+        let time: String = match conn.hget(make_dataset_hashset_key(&user_name, &dataset_uuid), "timestamp") {
             Ok(val) => val,
             Err(e) => {return Err(e);}
         };
@@ -114,7 +120,8 @@ impl RedisManager {
         &self,
         user_name: &String,
         dataset_uuid: &Uuid,
-    ) -> Option<Result<PathBuf, RedisError>> {
+    ) -> Option<Result<PathBuf, RedisError>> 
+    {
         match self.dataset_exists(user_name, dataset_uuid) {
             Ok(val) => match val {
                 true => (),
@@ -135,7 +142,7 @@ impl RedisManager {
         };
 
         let path: String = match conn.hget(
-            make_dataset_hashset_key(user_name, &dataset_uuid.to_string()),
+            make_dataset_hashset_key(user_name, &dataset_uuid),
             "path",
         ) {
             Ok(val) => val,
@@ -147,6 +154,15 @@ impl RedisManager {
         return Some(Ok(std::path::PathBuf::from(&path)));
     }
 
+    pub(crate) fn get_dataset_name(
+        &self,
+        user_name: &String,
+        dataset_uuid: &Uuid,
+    ) -> Result<String, RedisError>{
+        let mut conn = self.get_connection()?;
+        let name: String = conn.hget(make_dataset_hashset_key(user_name,dataset_uuid), "name")?;
+        return Ok(name);
+    }
     fn dataset_exists(&self, user_name: &String, dataset_uuid: &Uuid) -> Result<bool, RedisError> {
         let mut conn = self.get_connection()?;
 
@@ -174,7 +190,7 @@ impl RedisManager {
         let mut conn = self.get_connection()?;
 
         conn.hset(
-            make_dataset_hashset_key(user_name, &dataset_id.to_string()),
+            make_dataset_hashset_key(user_name, &dataset_id),
             "size",
             size,
         )?;
@@ -188,7 +204,7 @@ impl RedisManager {
         dataset_id: Uuid,
     ) -> Result<u64, RedisError> {
         return Ok(self.get_connection()?.hget(
-            make_dataset_hashset_key(user_name, &dataset_id.to_string()),
+            make_dataset_hashset_key(user_name, &dataset_id),
             "size",
         )?);
     }
